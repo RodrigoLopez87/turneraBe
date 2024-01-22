@@ -20,4 +20,5 @@ public class EntityController : ControllerBase
         var entities = this._dbContext.Entities.ToList();
         return Ok(entities);
     }
+    //un comentario para comitear
 }
