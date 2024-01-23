@@ -15,22 +15,32 @@ public partial class TurneraContext : DbContext
     {
     }
 
+    public virtual DbSet<EfmigrationsHistory> EfmigrationsHistories { get; set; }
+
     public virtual DbSet<Entity> Entities { get; set; }
 
     public virtual DbSet<EntityProfessional> EntityProfessionals { get; set; }
 
+    public virtual DbSet<Marca> Marcas { get; set; }
+
+    public virtual DbSet<Producto> Productos { get; set; }
+
     public virtual DbSet<Professional> Professionals { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-        if (!optionsBuilder.IsConfigured)
-        {
-            
-        }
-    }
-        
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder){}
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<EfmigrationsHistory>(entity =>
+        {
+            entity.HasKey(e => e.MigrationId).HasName("PRIMARY");
+
+            entity.ToTable("__EFMigrationsHistory");
+
+            entity.Property(e => e.MigrationId).HasMaxLength(150);
+            entity.Property(e => e.ProductVersion).HasMaxLength(32);
+        });
+
         modelBuilder.Entity<Entity>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -66,6 +76,50 @@ public partial class TurneraContext : DbContext
             entity.Property(e => e.IdProfessional)
                 .HasColumnType("int(11)")
                 .HasColumnName("id_professional");
+        });
+
+        modelBuilder.Entity<Marca>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("marca");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Producto>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("producto");
+
+            entity.HasIndex(e => e.MarcaId, "marca_id");
+
+            entity.Property(e => e.Id)
+                .HasColumnType("int(11)")
+                .HasColumnName("id");
+            entity.Property(e => e.ImgUrl)
+                .HasMaxLength(2000)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnName("img_url");
+            entity.Property(e => e.MarcaId)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnType("int(11)")
+                .HasColumnName("marca_id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnName("name");
+            entity.Property(e => e.Price)
+                .HasDefaultValueSql("'NULL'")
+                .HasColumnType("int(11)")
+                .HasColumnName("price");
         });
 
         modelBuilder.Entity<Professional>(entity =>
